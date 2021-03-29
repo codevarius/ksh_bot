@@ -1,8 +1,18 @@
 {
   "properties": [
     {
-      "name": "access.token",
+      "name": "bot.access.token",
       "type": "java.lang.String",
       "description": "A secret token to access TelegramAPI."
+    },
+    {
+      "name": "bot.name",
+      "type": "java.lang.String",
+      "description": "Telegram Bot name."
+    },
+    {
+      "name": "quote.gen.uri",
+      "type": "java.lang.String",
+      "description": "Telegram Bot name."
     }
   ] }
