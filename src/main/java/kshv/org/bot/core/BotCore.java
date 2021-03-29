@@ -44,7 +44,7 @@ public final class BotCore extends TelegramLongPollingBot {
                         execute(botService.performServiceAndGetResult(message));
                     }
                 } catch (TelegramApiException e) {
-                    logger.error("Failed to send message due to error: {}", e.getMessage());
+                    logger.warn("Failed to send message due to error: {}", e.getMessage());
                 }
             }
         }

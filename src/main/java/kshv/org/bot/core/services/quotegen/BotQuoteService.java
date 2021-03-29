@@ -38,21 +38,24 @@ public class BotQuoteService implements BotService {
 
     @Override
     public SendMessage performServiceAndGetResult(Message message) throws TelegramApiException {
-        if (message.getText().contains(triggerPatternStr) && isServiceCooledDown(LocalDateTime.now())) {
+        if (message.getText() != null
+                && message.getText().contains(triggerPatternStr)
+                && isServiceCooledDown(LocalDateTime.now())) {
             SendMessage response = new SendMessage();
             Long chatId = message.getChatId();
             response.setChatId(String.valueOf(chatId));
             BotQuoteEntity quote = restTemplate
-                    .getForEntity(quoteGenUri + "&" + getRandomSixDigitNumber(), BotQuoteEntity.class).getBody();
+                    .getForEntity(quoteGenUri + getRandomSixDigitNumber(), BotQuoteEntity.class).getBody();
             if (quote != null) {
                 quote.setQuoteGenDate(LocalDateTime.now());
                 botQuoteRepository.save(quote);
                 String text = "Как сказал " + quote.getQuoteAuthor() + ": \"" + quote.getQuoteText() + "\"";
                 response.setText(text);
+                return response;
             }
-            return response;
+            throw new TelegramApiException("response has not been sent back due to missing quote to pack in response");
         }
-        throw new TelegramApiException("response has not been sent back");
+        throw new TelegramApiException("response has not been sent due to empty message, missing args or cool down");
     }
 
     private boolean isServiceCooledDown(LocalDateTime now) {
@@ -60,7 +63,7 @@ public class BotQuoteService implements BotService {
         if (quoteEntity.isPresent()) {
             LocalDateTime lastQuoteSentDate = quoteEntity.get().getQuoteGenDate();
             return LocalDateTime.now().isAfter(lastQuoteSentDate.plusMinutes(coolDownTimeAmount));
-        }else{
+        } else {
             return true;
         }
     }
