@@ -1,6 +1,7 @@
-package kshv.org.bot.core.data;
+package kshv.org.bot.core.services.quotegen.data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "quotes")
@@ -15,6 +16,7 @@ public class BotQuoteEntity {
     private String senderName;
     private String senderLink;
     private String quoteLink;
+    private LocalDateTime quoteGenDate;
 
     public String getQuoteText() {
         return quoteText.equals("") ? "эх, забыл...😅" : quoteText;
@@ -60,8 +62,15 @@ public class BotQuoteEntity {
         this.id = id;
     }
 
-
     public Long getId() {
         return id;
+    }
+
+    public LocalDateTime getQuoteGenDate() {
+        return quoteGenDate;
+    }
+
+    public void setQuoteGenDate(LocalDateTime quoteGenDate) {
+        this.quoteGenDate = quoteGenDate;
     }
 }
