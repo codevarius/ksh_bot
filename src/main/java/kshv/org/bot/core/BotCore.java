@@ -4,7 +4,6 @@ import kshv.org.bot.core.interfaces.BotService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -23,13 +22,11 @@ public final class BotCore extends TelegramLongPollingBot {
     private String username;
 
     private final Logger logger;
-    private final BotService botService;
     private final List<BotService> botServicesList;
 
     @Autowired
-    public BotCore(Logger logger, BotService botService, List<BotService> botServicesList) {
+    public BotCore(Logger logger, List<BotService> botServicesList) {
         this.logger = logger;
-        this.botService = botService;
         this.botServicesList = botServicesList;
     }
 
@@ -41,6 +38,7 @@ public final class BotCore extends TelegramLongPollingBot {
                     Message message = update.getMessage();
                     logger.info("Incoming message \"{}\" to {}", message.getText(), message.getChat().getTitle());
                     for (BotService botService : botServicesList) {
+                        //TODO test multiply service exec
                         execute(botService.performServiceAndGetResult(message));
                     }
                 } catch (TelegramApiException e) {
