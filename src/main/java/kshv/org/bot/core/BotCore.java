@@ -38,7 +38,6 @@ public final class BotCore extends TelegramLongPollingBot {
                     Message message = update.getMessage();
                     logger.info("Incoming message \"{}\" to {}", message.getText(), message.getChat().getTitle());
                     for (BotService botService : botServicesList) {
-                        //TODO test multiply service exec
                         execute(botService.performServiceAndGetResult(message));
                     }
                 } catch (TelegramApiException e) {
