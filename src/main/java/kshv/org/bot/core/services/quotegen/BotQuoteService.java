@@ -62,13 +62,13 @@ public class BotQuoteService implements BotService {
         Optional<BotQuoteEntity> quoteEntity = botQuoteRepository.findLatestAddedBotQuoteEntity();
         if (quoteEntity.isPresent()) {
             LocalDateTime lastQuoteSentDate = quoteEntity.get().getQuoteGenDate();
-            return LocalDateTime.now().isAfter(lastQuoteSentDate.plusMinutes(coolDownTimeAmount));
+            return now.isAfter(lastQuoteSentDate.plusMinutes(coolDownTimeAmount));
         } else {
             return true;
         }
     }
 
-    private String getRandomSixDigitNumber() {
+    protected String getRandomSixDigitNumber() {
         Random rnd = new Random();
         int number = rnd.nextInt(999999);
         return String.format("%06d", number);

@@ -22,12 +22,28 @@ public class BotQuoteEntity {
         return quoteText.equals("") ? "эх, забыл...😅" : quoteText;
     }
 
-    public void setQuoteText(String quoteText) {
-        this.quoteText = quoteText;
-    }
-
     public String getQuoteAuthor() {
         return quoteAuthor.equals("") ? "один мудрец" : quoteAuthor;
+    }
+
+    public LocalDateTime getQuoteGenDate() {
+        return quoteGenDate;
+    }
+
+    public void setQuoteGenDate(LocalDateTime quoteGenDate) {
+        this.quoteGenDate = quoteGenDate;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setQuoteText(String quoteText) {
+        this.quoteText = quoteText;
     }
 
     public void setQuoteAuthor(String quoteAuthor) {
@@ -56,21 +72,5 @@ public class BotQuoteEntity {
 
     public void setQuoteLink(String quoteLink) {
         this.quoteLink = quoteLink;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public LocalDateTime getQuoteGenDate() {
-        return quoteGenDate;
-    }
-
-    public void setQuoteGenDate(LocalDateTime quoteGenDate) {
-        this.quoteGenDate = quoteGenDate;
     }
 }
