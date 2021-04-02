@@ -1,2 +1,2 @@
-# ksh_bot
-Spring Boot Telegram Bot
+# pai_mei_bot
+Pai Mei documentation 👉 [coming soon]
