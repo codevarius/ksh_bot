@@ -1,4 +1,4 @@
-package kshv.org.bot.core.services.quotegen;
+package kshv.org.bot.core.services;
 
 import kshv.org.bot.core.interfaces.BotService;
 import org.springframework.stereotype.Service;
