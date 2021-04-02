@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -38,10 +39,11 @@ public final class BotCore extends TelegramLongPollingBot {
                     Message message = update.getMessage();
                     logger.info("Incoming message \"{}\" to {}", message.getText(), message.getChat().getTitle());
                     for (BotService botService : botServicesList) {
-                        execute(botService.performServiceAndGetResult(message));
+                        if (botService.validateMessage(message))
+                            execute(botService.performServiceAndGetResult(message).orElseGet(SendMessage::new));
                     }
                 } catch (TelegramApiException e) {
-                    logger.warn("Failed to send message due to error: {}", e.getMessage());
+                    logger.error("Failed to send message due to error: {}", e.getMessage());
                 }
             }
         }

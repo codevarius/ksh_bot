@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -37,25 +36,27 @@ public class BotQuoteService implements BotService {
     }
 
     @Override
-    public SendMessage performServiceAndGetResult(Message message) throws TelegramApiException {
-        if (message.getText() != null
+    public Boolean validateMessage(Message message) {
+        return message.getText() != null
                 && message.getText().contains(triggerPatternStr)
-                && isServiceCooledDown(LocalDateTime.now())) {
-            SendMessage response = new SendMessage();
-            Long chatId = message.getChatId();
-            response.setChatId(String.valueOf(chatId));
-            BotQuoteEntity quote = restTemplate
-                    .getForEntity(quoteGenUri + getRandomSixDigitNumber(), BotQuoteEntity.class).getBody();
-            if (quote != null) {
-                quote.setQuoteGenDate(LocalDateTime.now());
-                botQuoteRepository.save(quote);
-                String text = "Как сказал " + quote.getQuoteAuthor() + ": \"" + quote.getQuoteText() + "\"";
-                response.setText(text);
-                return response;
-            }
-            throw new TelegramApiException("response has not been sent back due to missing quote to pack in response");
+                && isServiceCooledDown(LocalDateTime.now());
+    }
+
+    @Override
+    public Optional<SendMessage> performServiceAndGetResult(Message message) {
+        Optional<SendMessage> response = Optional.of(new SendMessage());
+        Long chatId = message.getChatId();
+        response.get().setChatId(String.valueOf(chatId));
+        BotQuoteEntity quote = restTemplate
+                .getForEntity(quoteGenUri + getRandomSixDigitNumber(), BotQuoteEntity.class).getBody();
+        if (quote != null) {
+            quote.setQuoteGenDate(LocalDateTime.now());
+            botQuoteRepository.save(quote);
+            String text = "Как сказал " + quote.getQuoteAuthor() + ": \"" + quote.getQuoteText() + "\"";
+            response.get().setText(text);
+            return response;
         }
-        throw new TelegramApiException("response has not been sent due to empty message, missing args or cool down");
+        return Optional.empty();
     }
 
     private boolean isServiceCooledDown(LocalDateTime now) {
