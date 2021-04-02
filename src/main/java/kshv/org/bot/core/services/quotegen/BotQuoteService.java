@@ -70,8 +70,7 @@ public class BotQuoteService implements BotService {
     }
 
     protected String getRandomSixDigitNumber() {
-        Random rnd = new Random();
-        int number = rnd.nextInt(999999);
+        int number = new Random().nextInt(999999);
         return String.format("%06d", number);
     }
 }
