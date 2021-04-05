@@ -1,6 +1,7 @@
 package kshv.org.bot.core;
 
 import kshv.org.bot.core.interfaces.BotService;
+import kshv.org.bot.core.services.loader.BotActionLoaderService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,11 +25,14 @@ public final class BotCore extends TelegramLongPollingBot {
 
     private final Logger logger;
     private final List<BotService> botServicesList;
+    private final BotActionLoaderService actionLoaderService;
 
     @Autowired
-    public BotCore(Logger logger, List<BotService> botServicesList) {
+    public BotCore(Logger logger, List<BotService> botServicesList, BotActionLoaderService actionLoaderService) {
         this.logger = logger;
         this.botServicesList = botServicesList;
+        this.actionLoaderService = actionLoaderService;
+        logger.info("core constructed");
     }
 
     @Override
@@ -51,8 +55,9 @@ public final class BotCore extends TelegramLongPollingBot {
 
     @Override
     public void onRegister() {
-        logger.info("bot registered");
-
+        logger.info("action loader init");
+        actionLoaderService.initAllStoredActions(botServicesList);
+        logger.info("action loader init completed, bot registered");
     }
 
     @Override
@@ -69,4 +74,5 @@ public final class BotCore extends TelegramLongPollingBot {
     public String getBotUsername() {
         return username;
     }
+
 }

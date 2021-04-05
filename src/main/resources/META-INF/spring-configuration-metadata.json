@@ -24,6 +24,11 @@
       "name": "quote.gen.params.cool_down.time.amount",
       "type": "java.lang.Short",
       "description": "time units to cool down quotes service before next call"
+    },
+    {
+      "name": "bot.actions.folder.path",
+      "type": "java.lang.Short",
+      "description": "path to store bot java actions files"
     }
   ]
 }
