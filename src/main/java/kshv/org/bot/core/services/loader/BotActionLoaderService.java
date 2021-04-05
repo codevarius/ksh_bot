@@ -22,13 +22,11 @@ public class BotActionLoaderService {
     private String path;
 
     private final Logger logger;
-    private final GenericBeanDefinition genericBeanDefinition;
     private List<BotService> botServicesList;
 
     @Autowired
-    public BotActionLoaderService(Logger logger, GenericBeanDefinition genericBeanDefinition) {
+    public BotActionLoaderService(Logger logger) {
         this.logger = logger;
-        this.genericBeanDefinition = genericBeanDefinition;
     }
 
     public void initAllStoredActions(List<BotService> botServicesList) {
@@ -47,7 +45,7 @@ public class BotActionLoaderService {
                 loadAndCompileAction(actionCodeFile);
             }
         } else {
-            logger.error("problems loading actions: no actions found or incorrect path");
+            logger.warn("problems loading actions: no actions found or incorrect path");
         }
     }
 
