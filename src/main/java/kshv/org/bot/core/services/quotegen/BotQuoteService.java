@@ -1,5 +1,6 @@
 package kshv.org.bot.core.services.quotegen;
 
+import kshv.org.bot.core.BotCore;
 import kshv.org.bot.core.interfaces.BotService;
 import kshv.org.bot.core.services.quotegen.data.BotQuoteEntity;
 import kshv.org.bot.core.services.quotegen.data.BotQuoteRepository;
@@ -36,7 +37,7 @@ public class BotQuoteService implements BotService {
     }
 
     @Override
-    public Boolean validateMessage(Message message) {
+    public Boolean validateUserCommandString(Message message) {
         return message.getText() != null
                 && message.getText().contains(triggerPatternStr)
                 && isServiceCooledDown(LocalDateTime.now());
@@ -44,17 +45,13 @@ public class BotQuoteService implements BotService {
 
     @Override
     public Optional<SendMessage> performServiceAndGetResult(Message message) {
-        Optional<SendMessage> response = Optional.of(new SendMessage());
-        Long chatId = message.getChatId();
-        response.get().setChatId(String.valueOf(chatId));
         BotQuoteEntity quote = restTemplate
                 .getForEntity(quoteGenUri + getRandomSixDigitNumber(), BotQuoteEntity.class).getBody();
         if (quote != null) {
             quote.setQuoteGenDate(LocalDateTime.now());
             botQuoteRepository.save(quote);
             String text = "Как сказал " + quote.getQuoteAuthor() + ": \"" + quote.getQuoteText() + "\"";
-            response.get().setText(text);
-            return response;
+            return BotCore.newResponseTextMessage(message, text);
         }
         return Optional.empty();
     }

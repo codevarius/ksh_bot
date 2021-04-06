@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public final class BotCore extends TelegramLongPollingBot {
@@ -35,6 +36,15 @@ public final class BotCore extends TelegramLongPollingBot {
         logger.info("core constructed");
     }
 
+    public static Optional<SendMessage> newResponseTextMessage(Message message, String text) {
+        Optional<SendMessage> response = Optional.of(new SendMessage());
+        Long chatId = message.getChatId();
+        response.get().setChatId(String.valueOf(chatId));
+        response.get().setReplyToMessageId(message.getMessageId());
+        response.get().setText(text);
+        return response;
+    }
+
     @Override
     public void onUpdatesReceived(List<Update> updates) {
         for (Update update : updates) {
@@ -42,9 +52,11 @@ public final class BotCore extends TelegramLongPollingBot {
                 try {
                     Message message = update.getMessage();
                     logger.info("Incoming message \"{}\" to {}", message.getText(), message.getChat().getTitle());
-                    for (BotService botService : botServicesList) {
-                        if (botService.validateMessage(message))
-                            execute(botService.performServiceAndGetResult(message).orElseGet(SendMessage::new));
+                    if (botServicesList != null && !botServicesList.isEmpty()) {
+                        for (BotService botService : botServicesList) {
+                            if (botService.validateUserCommandString(message))
+                                execute(botService.performServiceAndGetResult(message).orElseGet(SendMessage::new));
+                        }
                     }
                 } catch (TelegramApiException e) {
                     logger.error("Failed to send message due to error: {}", e.getMessage());

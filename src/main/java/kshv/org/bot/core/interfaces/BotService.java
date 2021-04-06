@@ -13,5 +13,5 @@ public interface BotService {
      */
     Optional<SendMessage> performServiceAndGetResult(Message message);
 
-    Boolean validateMessage(Message message);
+    Boolean validateUserCommandString(Message message);
 }
