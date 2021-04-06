@@ -93,7 +93,7 @@ public class BotActionLoaderService implements BotService {
         boolean a = botActionServiceClass.getName().endsWith("Service");
         boolean b = botActionServiceClass.isAnnotationPresent(Service.class);
         boolean c = Arrays.stream(botActionServiceClass.getInterfaces())
-                .anyMatch((aClass) -> aClass.getName().equals(BotService.class.getName()));
+                .anyMatch((aClass) -> aClass.isAssignableFrom(BotService.class));
         return a && b && c;
     }
 
@@ -108,8 +108,9 @@ public class BotActionLoaderService implements BotService {
         try {
             String fileId = message.getDocument().getFileId();
             String fileInfoUrl = String.format("https://api.telegram.org/bot%s/getFile?file_id=%s", token, fileId);
-            TelegramApiResponse apiResponse =
-                    restTemplate.getForObject(fileInfoUrl, TelegramApiResponse.class);
+            TelegramApiResponse apiResponse = Optional.ofNullable(
+                    restTemplate.getForObject(fileInfoUrl, TelegramApiResponse.class))
+                    .orElseThrow(() -> new Exception("document not found"));
             BotActionEntity botActionEntity = new ObjectMapper()
                     .convertValue(apiResponse.getResult(), BotActionEntity.class);
             botActionRepository.save(botActionEntity);

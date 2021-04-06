@@ -20,7 +20,7 @@ class BotQuoteServiceTest {
     }
 
     @Test
-    public void testGetRandomSixDigitNumber() {
+    void testGetRandomSixDigitNumber() {
         var iteration = 0;
         while (iteration++ <= 100) {
             var testSeed = botQuoteService.getRandomSixDigitNumber();

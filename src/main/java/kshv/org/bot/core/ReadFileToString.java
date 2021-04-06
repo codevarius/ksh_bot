@@ -8,6 +8,8 @@ import java.util.stream.Stream;
 
 public class ReadFileToString {
 
+    private ReadFileToString(){}
+
     public static String readLineByLine(String filePath) {
         StringBuilder contentBuilder = new StringBuilder();
 

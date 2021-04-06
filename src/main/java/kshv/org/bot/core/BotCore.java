@@ -54,7 +54,6 @@ public final class BotCore extends TelegramLongPollingBot {
                     Message message = update.getMessage();
                     logger.info("Incoming message \"{}\" to {}", message.getText(), message.getChat().getTitle());
                     if (botServicesList != null && !botServicesList.isEmpty()) {
-                        Iterator<BotService> botServiceIterator = botServicesList.iterator();
                         for (BotService botService : botServicesList) {
                             if (botService.validateUserCommandString(message))
                                 execute(botService.performServiceAndGetResult(message).orElseGet(SendMessage::new));
