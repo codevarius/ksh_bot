@@ -21,6 +21,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +51,7 @@ public class BotActionLoaderService implements BotService {
     }
 
     public void initAllStoredActions(List<BotService> botServicesList) {
-        this.botServicesList = botServicesList;
+        this.botServicesList = new ArrayList<BotService>(botServicesList);
         File dir = new File(path);
         FilenameFilter filter = (f, name) -> {
             logger.info(String.format("reading %s", name));
@@ -96,6 +97,11 @@ public class BotActionLoaderService implements BotService {
         return a && b && c;
     }
 
+    public void updateActionList(List<BotService> targetBotServiceList) {
+        botServicesList.removeAll(targetBotServiceList);
+        targetBotServiceList.addAll(botServicesList);
+        logger.info(String.format("updated bot service list; present size:%d", targetBotServiceList.size()));
+    }
 
     @Override
     public Optional<SendMessage> performServiceAndGetResult(Message message) {

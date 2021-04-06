@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +54,7 @@ public final class BotCore extends TelegramLongPollingBot {
                     Message message = update.getMessage();
                     logger.info("Incoming message \"{}\" to {}", message.getText(), message.getChat().getTitle());
                     if (botServicesList != null && !botServicesList.isEmpty()) {
+                        Iterator<BotService> botServiceIterator = botServicesList.iterator();
                         for (BotService botService : botServicesList) {
                             if (botService.validateUserCommandString(message))
                                 execute(botService.performServiceAndGetResult(message).orElseGet(SendMessage::new));
@@ -63,12 +65,14 @@ public final class BotCore extends TelegramLongPollingBot {
                 }
             }
         }
+        actionLoaderService.updateActionList(botServicesList);
     }
 
     @Override
     public void onRegister() {
         logger.info("action loader init");
         actionLoaderService.initAllStoredActions(botServicesList);
+        actionLoaderService.updateActionList(botServicesList);
         logger.info("action loader init completed, bot registered");
     }
 
