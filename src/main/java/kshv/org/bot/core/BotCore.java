@@ -1,7 +1,7 @@
 package kshv.org.bot.core;
 
 import kshv.org.bot.core.interfaces.BotService;
-import kshv.org.bot.core.services.loader.BotActionLoaderService;
+import kshv.org.bot.core.services.loader.BotActionManagerService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +12,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,13 +26,13 @@ public final class BotCore extends TelegramLongPollingBot {
 
     private final Logger logger;
     private final List<BotService> botServicesList;
-    private final BotActionLoaderService actionLoaderService;
+    private final BotActionManagerService actionManagerService;
 
     @Autowired
-    public BotCore(Logger logger, List<BotService> botServicesList, BotActionLoaderService actionLoaderService) {
+    public BotCore(Logger logger, List<BotService> botServicesList, BotActionManagerService actionManagerService) {
         this.logger = logger;
         this.botServicesList = botServicesList;
-        this.actionLoaderService = actionLoaderService;
+        this.actionManagerService = actionManagerService;
         logger.info("core constructed");
     }
 
@@ -64,14 +63,14 @@ public final class BotCore extends TelegramLongPollingBot {
                 }
             }
         }
-        actionLoaderService.updateActionList(botServicesList);
+        actionManagerService.updateActionList(botServicesList);
     }
 
     @Override
     public void onRegister() {
         logger.info("action loader init");
-        actionLoaderService.initAllStoredActions(botServicesList);
-        actionLoaderService.updateActionList(botServicesList);
+        actionManagerService.initAllStoredActions(botServicesList);
+        actionManagerService.updateActionList(botServicesList);
         logger.info("action loader init completed, bot registered");
     }
 

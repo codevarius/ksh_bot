@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class BotActionLoaderService implements BotService {
+public class BotActionManagerService implements BotService {
 
     @Value("${bot.actions.folder.path}")
     private String path;
@@ -44,7 +44,7 @@ public class BotActionLoaderService implements BotService {
     private final BotActionRepository botActionRepository;
 
     @Autowired
-    public BotActionLoaderService(Logger logger, RestTemplate restTemplate, BotActionRepository botActionRepository) {
+    public BotActionManagerService(Logger logger, RestTemplate restTemplate, BotActionRepository botActionRepository) {
         this.logger = logger;
         this.restTemplate = restTemplate;
         this.botActionRepository = botActionRepository;
@@ -78,13 +78,15 @@ public class BotActionLoaderService implements BotService {
         logger.info(String.format("parsing to string code of %s", actionCodeFile.getName()));
         String actionCodeString = ReadFileToString.readLineByLine(actionCodeFile.getAbsolutePath());
         String actionClassName = actionCodeFile.getName().replace(".java", "");
+        logger.info(String.format("compiling %s", actionCodeFile.getName()));
         Reflect reflect = Reflect.compile("kshv.org.bot.core.services." + actionClassName, actionCodeString);
-        if (validateBotService(reflect)) {
+        logger.info(String.format("compiling over: %s",reflect.toString()));
+        if (reflect != null && validateBotService(reflect)) {
             BotService botActionService = reflect.create().get();
             botServicesList.add(botActionService);
             logger.info(String.format("bean %s autowired", botActionService.toString()));
         } else {
-            throw new Exception("action compilation error");
+            throw new Exception("compilation or validation problems");
         }
     }
 
@@ -113,7 +115,6 @@ public class BotActionLoaderService implements BotService {
                     .orElseThrow(() -> new Exception("document not found"));
             BotActionEntity botActionEntity = new ObjectMapper()
                     .convertValue(apiResponse.getResult(), BotActionEntity.class);
-            botActionRepository.save(botActionEntity);
             String downloadActionCodeUrl = String.format("https://api.telegram.org/file/bot%s/%s", token, botActionEntity.getFilePath());
             File file = restTemplate.execute(downloadActionCodeUrl, HttpMethod.GET, null, clientHttpResponse -> {
                 File ret = new File(path + "/" + message.getDocument().getFileName());
@@ -121,6 +122,7 @@ public class BotActionLoaderService implements BotService {
                 return ret;
             });
             loadAndCompileAction(file);
+            botActionRepository.save(botActionEntity);
             return BotCore.newResponseTextMessage(message, "Великий Учитель принять и запомнить твой дар!");
         } catch (Exception e) {
             logger.warn(String.format("new action has not been uploaded due to issue:%s", e.getMessage()));
